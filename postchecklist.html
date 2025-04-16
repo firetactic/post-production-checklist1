@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post-Production Checklist</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-color: #333;
+      --bg-color: #ffffff;
+      --accent-color: #FF5733;
+      --cta-bg: #fff;
+      --cta-text: var(--accent-color);
+      --cta-border: var(--accent-color);
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --border-radius: 12px;
+      --padding: clamp(13px, 2.6vw, 26px);
+      --max-width: clamp(900px, 95vw, 1200px);
+      --base-small-text: 1.3rem;
+      --small-text: calc(var(--base-small-text) * 1.3);
+    }
+
+    body.dark-mode {
+      --text-color: #fff;
+      --bg-color: #000;
+      --shadow-color: rgba(255, 255, 255, 0.2);
+      --cta-bg: #000;
+      --cta-text: #fff;
+      --cta-border: #fff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: var(--padding);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: var(--base-small-text);
+    }
+
+    .container {
+      width: var(--max-width);
+      box-shadow: 0 4px 8px var(--shadow-color);
+      padding: var(--padding);
+      border-radius: var(--border-radius);
+      background: var(--bg-color);
+    }
+
+    h1, h2, h3 {
+      color: var(--accent-color);
+      font-weight: 800;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 6.5vw, 3.9rem);
+    }
+
+    h2 {
+      font-size: clamp(1.95rem, 5.2vw, 2.6rem);
+      margin: 1.95rem 0 1.3rem;
+    }
+
+    h3 {
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+    }
+
+    .switch-container {
+      position: fixed;
+      top: clamp(19.5px, 3.9vw, 39px);
+      right: clamp(19.5px, 3.9vw, 39px);
+      z-index: 30;
+      padding: clamp(6.5px, 1.3vw, 13px);
+      background: var(--bg-color);
+      border-radius: 50%;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: clamp(78px, 13vw, 156px);
+      height: clamp(44.2px, 7.8vw, 88.4px);
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: clamp(44.2px, 7.8vw, 88.4px);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: clamp(33.8px, 5.85vw, 67.6px);
+      width: clamp(33.8px, 5.85vw, 67.6px);
+      left: clamp(5.2px, 1.3vw, 10.4px);
+      bottom: clamp(5.2px, 1.3vw, 10.4px);
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(clamp(33.8px, 6.5vw, 67.6px));
+    }
+
+    .property-section, .guidelines-section, .checklist-section {
+      margin-bottom: 1.95rem;
+    }
+
+    .property-section label {
+      display: block;
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+    }
+
+    .property-section input {
+      width: 100%;
+      max-width: 1200px;
+      padding: 10.4px;
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      border: 2px solid var(--cta-border);
+      border-radius: var(--border-radius);
+      background: var(--cta-bg);
+      color: var(--text-color);
+    }
+
+    .property-section select {
+      padding: 10.4px;
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      border: 2px solid var(--cta-border);
+      border-radius: var(--border-radius);
+      background: var(--cta-bg);
+      color: var(--text-color);
+      width: 300px;
+    }
+
+    .property-section input[type="number"] {
+      width: 100px;
+      padding: 10.4px;
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      border: 2px solid var(--cta-border);
+      border-radius: var(--border-radius);
+      background: var(--cta-bg);
+      color: var(--text-color);
+    }
+
+    .checklist-section {
+      background: var(--cta-bg);
+      border: 3px solid var(--cta-border);
+      border-radius: var(--border-radius);
+      padding: var(--padding);
+      box-shadow: 0 4px 6px var(--shadow-color);
+      transition: all 0.3s ease;
+    }
+
+    .shot-item {
+      margin: 0.65rem 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 0.65rem;
+      border-radius: var(--border-radius);
+      transition: background 0.1s ease;
+    }
+
+    .shot-item:hover {
+      background: #f5f5f5;
+    }
+
+    body.dark-mode .shot-item:hover {
+      background: #333;
+    }
+
+    .shot-item label {
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      font-weight: 700;
+      margin-right: 1.04rem;
+    }
+
+    .shot-item input[type="file"], .shot-item input[type="text"] {
+      margin: 0.39rem 1.04rem 0 0;
+      padding: 6.5px;
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      border: 2px solid var(--cta-border);
+      border-radius: var(--border-radius);
+      background: var(--cta-bg);
+      color: var(--text-color);
+    }
+
+    .shot-item input[type="checkbox"] {
+      width: clamp(26px, 3.9vw, 32.5px);
+      height: clamp(26px, 3.9vw, 32.5px);
+      margin: 0.39rem 1.04rem 0 0;
+      accent-color: var(--accent-color);
+      cursor: pointer;
+    }
+
+    .notes-btn {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 6.5px 13px;
+      font-size: 1.04rem;
+      font-weight: 700;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      margin-left: 1.3rem;
+    }
+
+    .notes-btn:hover {
+      background: #e04e2d;
+    }
+
+    .notes-input {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0.65rem 0 0 clamp(26px, 3.9vw, 32.5px);
+      padding: 6.5px;
+      font-size: var(--small-text);
+      border: 2px solid var(--cta-border);
+      border-radius: var(--border-radius);
+      background: var(--cta-bg);
+      color: var(--text-color);
+    }
+
+    .notes-input.visible {
+      display: block;
+    }
+
+    .instructions {
+      font-size: var(--small-text);
+      color: #666;
+      margin-left: clamp(26px, 3.9vw, 32.5px);
+      margin-top: 0.65rem;
+    }
+
+    body.dark-mode .instructions {
+      color: #ccc;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 1.3rem;
+      margin: 1.95rem auto 2.6rem;
+    }
+
+    .download-btn, .submit-btn {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 15.6px 26px;
+      font-size: clamp(1.3rem, 2.6vw, 1.56rem);
+      font-weight: 700;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      width: clamp(325px, 52vw, 520px);
+      box-shadow: 0 4px 6px var(--shadow-color);
+      transition: transform 0.1s ease, background 0.2s ease;
+    }
+
+    .download-btn:hover, .submit-btn:hover {
+      background: #e04e2d;
+    }
+
+    .download-btn:active, .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: var(--base-small-text);
+      color: #666;
+      padding: 1.3rem 0;
+      margin-bottom: 0;
+    }
+
+    body.dark-mode .footer {
+      color: #ccc;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 1.17rem;
+      }
+      .shot-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .shot-item input[type="text"], .shot-item input[type="file"] {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      .notes-btn {
+        margin-top: 5px;
+      }
+      .download-btn, .submit-btn {
+        width: 100%;
+      }
+      .switch-container {
+        top: 13px;
+        right: 13px;
+      }
+      .property-section select {
+        width: 100%;
+      }
+      .property-section input[type="number"] {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .shot-item,
+      button,
+      .checklist-section,
+      .slider {
+        transition: none;
+      }
+      .download-btn:active,
+      .submit-btn:active {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="switch-container">
+    <label class="switch">
+      <input type="checkbox" id="dark-mode-toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <div class="container">
+    <h1>Post-Production Checklist</h1>
+    <div class="property-section">
+      <label for="property-name">Property Name:</label>
+      <input type="text" id="property-name" placeholder="Enter property name...">
+      <label for="property-address">Property Address:</label>
+      <input type="text" id="property-address" placeholder="Enter property address...">
+      <label for="property-id">Property ID:</label>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <select id="property-category" onchange="updatePropertyID()">
+          <option value="" disabled selected>Select category...</option>
+          <option value="RES">RES - Residential (Single-Family)</option>
+          <option value="APT">APT - Apartments / Multi-Family</option>
+          <option value="CON">CON - Condominiums</option>
+          <option value="RET">RET - Retail</option>
+          <option value="OFF">OFF - Offices</option>
+          <option value="HOT">HOT - Hotels / Lodging</option>
+          <option value="MED">MED - Medical / Healthcare</option>
+          <option value="EDU">EDU - Education</option>
+          <option value="RST">RST - Restaurant / Food Service</option>
+          <option value="GOV">GOV - Government</option>
+          <option value="IND">IND - Industrial / Manufacturing</option>
+          <option value="WHS">WHS - Warehouse / Storage</option>
+          <option value="REC">REC - Recreation / Entertainment</option>
+          <option value="REL">REL - Religious</option>
+          <option value="AGR">AGR - Agricultural</option>
+          <option value="MAR">MAR - Marine / Ports</option>
+          <option value="TRN">TRN - Transportation</option>
+          <option value="LAN">LAN - Land (Vacant)</option>
+          <option value="MIX">MIX - Mixed Use</option>
+          <option value="SPE">SPE - Special Purpose</option>
+        </select>
+        <input type="number" id="property-suffix" min="1" max="999" placeholder="001" oninput="updatePropertyID()">
+        <span id="property-id-display" style="font-weight: 700; font-size: clamp(1.3rem, 2.6vw, 1.56rem);"></span>
+      </div>
+    </div>
+    <form id="post-production-form">
+      <div class="checklist-section" id="syt-pre-post">
+        <h2>SYT.PRE - Free Pre-Incident Plan</h2>
+        <div class="shot-item">
+          <label>Iconic Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'iconic-drone-file-name')">
+          <input type="hidden" id="iconic-drone-file-name" name="iconic-drone-file-name">
+          <input type="text" name="iconic-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="iconic-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('iconic-drone-notes')">Add Notes</button>
+          <input type="text" id="iconic-drone-notes" name="iconic-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Enhance colors in Lightroom: Adjust vibrance (+20) and saturation (+15).<br>
+            - Overlay text in Photoshop: Add "[Property Name] | Iconic View | Pre-Incident Ready" in white, bottom-right corner, 24pt font.<br>
+            - Crop to 1920x1080 for consistency.<br>
+            - Remove distractions (e.g., people, wires) using clone stamp tool.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>North Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'north-drone-file-name')">
+          <input type="hidden" id="north-drone-file-name" name="north-drone-file-name">
+          <input type="text" name="north-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="north-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('north-drone-notes')">Add Notes</button>
+          <input type="text" id="north-drone-notes" name="north-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "North View" in white, top-left corner, 20pt font.<br>
+            - Adjust exposure in Lightroom to ensure building details are clear (+0.5 stop if needed).<br>
+            - Crop to 1920x1080.<br>
+            - Correct lens distortion using Photoshop’s Lens Correction filter.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Northeast Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'northeast-drone-file-name')">
+          <input type="hidden" id="northeast-drone-file-name" name="northeast-drone-file-name">
+          <input type="text" name="northeast-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="northeast-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('northeast-drone-notes')">Add Notes</button>
+          <input type="text" id="northeast-drone-notes" name="northeast-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "Northeast View" in white, top-left corner, 20pt font.<br>
+            - Enhance contrast in Lightroom (+10) for building visibility.<br>
+            - Crop to 1920x1080.<br>
+            - Remove sky imperfections using spot healing tool.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>East Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'east-drone-file-name')">
+          <input type="hidden" id="east-drone-file-name" name="east-drone-file-name">
+          <input type="text" name="east-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="east-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('east-drone-notes')">Add Notes</button>
+          <input type="text" id="east-drone-notes" name="east-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "East View" in white, top-left corner, 20pt font.<br>
+            - Balance colors in Lightroom to correct for lighting (adjust white balance if too warm).<br>
+            - Crop to 1920x1080.<br>
+            - Sharpen building edges using high-pass filter.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Southeast Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'southeast-drone-file-name')">
+          <input type="hidden" id="southeast-drone-file-name" name="southeast-drone-file-name">
+          <input type="text" name="southeast-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="southeast-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('southeast-drone-notes')">Add Notes</button>
+          <input type="text" id="southeast-drone-notes" name="southeast-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "Southeast View" in white, top-left corner, 20pt font.<br>
+            - Increase clarity in Lightroom (+15) for detail.<br>
+            - Crop to 1920x1080.<br>
+            - Remove any drone shadows using clone stamp tool.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>South Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'south-drone-file-name')">
+          <input type="hidden" id="south-drone-file-name" name="south-drone-file-name">
+          <input type="text" name="south-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="south-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('south-drone-notes')">Add Notes</button>
+          <input type="text" id="south-drone-notes" name="south-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "South View" in white, top-left corner, 20pt font.<br>
+            - Adjust brightness in Lightroom (+10) if image is too dark.<br>
+            - Crop to 1920x1080.<br>
+            - Enhance sky color using graduated filter in Lightroom.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Southwest Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'southwest-drone-file-name')">
+          <input type="hidden" id="southwest-drone-file-name" name="southwest-drone-file-name">
+          <input type="text" name="southwest-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="southwest-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('southwest-drone-notes')">Add Notes</button>
+          <input type="text" id="southwest-drone-notes" name="southwest-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "Southwest View" in white, top-left corner, 20pt font.<br>
+            - Correct shadows in Lightroom to highlight building features.<br>
+            - Crop to 1920x1080.<br>
+            - Remove debris or distractions using content-aware fill.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>West Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'west-drone-file-name')">
+          <input type="hidden" id="west-drone-file-name" name="west-drone-file-name">
+          <input type="text" name="west-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="west-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('west-drone-notes')">Add Notes</button>
+          <input type="text" id="west-drone-notes" name="west-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "West View" in white, top-left corner, 20pt font.<br>
+            - Enhance vibrance in Lightroom (+20) for lively colors.<br>
+            - Crop to 1920x1080.<br>
+            - Correct lens distortion using Photoshop’s Lens Correction filter.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Northwest Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'northwest-drone-file-name')">
+          <input type="hidden" id="northwest-drone-file-name" name="northwest-drone-file-name">
+          <input type="text" name="northwest-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="northwest-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('northwest-drone-notes')">Add Notes</button>
+          <input type="text" id="northwest-drone-notes" name="northwest-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Add direction label in Photoshop: "Northwest View" in white, top-left corner, 20pt font.<br>
+            - Adjust exposure in Lightroom to ensure clear details (+0.5 stop if needed).<br>
+            - Crop to 1920x1080.<br>
+            - Remove any sky imperfections using spot healing tool.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Overhead Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'overhead-drone-file-name')">
+          <input type="hidden" id="overhead-drone-file-name" name="overhead-drone-file-name">
+          <input type="text" name="overhead-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="overhead-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('overhead-drone-notes')">Add Notes</button>
+          <input type="text" id="overhead-drone-notes" name="overhead-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Label roof access points in Photoshop: Use arrows and text (e.g., "Access Point 1") in red, 18pt font.<br>
+            - Overlay text: "[Property Name] - Overhead View | Roof Access Marked" in white, bottom-center, 24pt font.<br>
+            - Crop to 1920x1080.<br>
+            - Enhance clarity in Lightroom (+20) for roof details.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Emergency Access Points (Handheld Single-Lens Image)</label>
+          <input type="file" onchange="updateFileName(this, 'access-single-file-name')">
+          <input type="hidden" id="access-single-file-name" name="access-single-file-name">
+          <input type="text" name="access-single-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="access-single-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('access-single-notes')">Add Notes</button>
+          <input type="text" id="access-single-notes" name="access-single-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Highlight fire lanes and entrances in Photoshop: Use red arrows pointing to key areas.<br>
+            - Overlay text: "Emergency Access | Fire Lane [Location] | Main Entrance [Location]" in white, bottom-left, 20pt font.<br>
+            - Crop to 1920x1080.<br>
+            - Adjust brightness in Lightroom (+10) for visibility.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Utility Areas (Handheld 360 Image)</label>
+          <input type="file" onchange="updateFileName(this, 'utility-360-file-name')">
+          <input type="hidden" id="utility-360-file-name" name="utility-360-file-name">
+          <input type="text" name="utility-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="utility-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('utility-360-notes')">Add Notes</button>
+          <input type="text" id="utility-360-notes" name="utility-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Stitch images in PTGui to create a seamless 360 panorama.<br>
+            - Annotate locations in Photoshop: Label "Gas Shutoff" and "Electrical Shutoff" with arrows, 18pt font.<br>
+            - Overlay text: "Utility Shutoffs | Gas [Location] | Electrical [Location] | 360 View" in white, bottom-center, 20pt font.<br>
+            - Remove tripod shadow using nadir patching in PTGui.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>360 Orbit (Drone Video)</label>
+          <input type="file" onchange="updateFileName(this, 'orbit-drone-file-name')">
+          <input type="hidden" id="orbit-drone-file-name" name="orbit-drone-file-name">
+          <input type="text" name="orbit-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="orbit-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('orbit-drone-notes')">Add Notes</button>
+          <input type="text" id="orbit-drone-notes" name="orbit-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Import into Premiere Pro and trim to 30-60 seconds.<br>
+            - Add title card: "360 Orbit | [Property Name]" in white, 24pt font, first 5 seconds.<br>
+            - Insert markers at key entrances with text overlays (e.g., "Main Entrance at 00:15") in white, 18pt font.<br>
+            - Stabilize footage using Warp Stabilizer in Premiere Pro.<br>
+            - Export as MP4, 4K, 24fps.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Walk-Through (Handheld 360 Video)</label>
+          <input type="file" onchange="updateFileName(this, 'walkthrough-360-file-name')">
+          <input type="hidden" id="walkthrough-360-file-name" name="walkthrough-360-file-name">
+          <input type="text" name="walkthrough-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="walkthrough-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('walkthrough-360-notes')">Add Notes</button>
+          <input type="text" id="walkthrough-360-notes" name="walkthrough-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro to trim unnecessary sections (aim for 1-2 minutes).<br>
+            - Add text at key points: "Emergency Exit at [Timestamp]" and "Key Area at [Timestamp]" in white, 18pt font.<br>
+            - Overlay: "Interior Walk-Through | [Property Name] | [Duration]" at start, white, 24pt font.<br>
+            - Adjust exposure in DaVinci Resolve for consistent lighting.<br>
+            - Export as MP4, 8K, 24fps.
+          </div>
+        </div>
+      </div>
+      <div class="checklist-section" id="promotional-photos">
+        <h2>Promotional Use (SYT.FYI) - Photo Shots</h2>
+        <div class="shot-item">
+          <label>Hero Shot (Drone Image)</label>
+          <input type="file" onchange="updateFileName(this, 'hero-drone-file-name')">
+          <input type="hidden" id="hero-drone-file-name" name="hero-drone-file-name">
+          <input type="text" name="hero-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="hero-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('hero-drone-notes')">Add Notes</button>
+          <input type="text" id="hero-drone-notes" name="hero-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Enhance cinematic look in Lightroom: Increase vibrance (+25) and apply warm LUT.<br>
+            - Crop to 1920x1080 for promotional use.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-right, 18pt font.<br>
+            - Stabilize any motion blur using Photoshop’s Shake Reduction filter.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Hero Shot (Handheld 360 Image)</label>
+          <input type="file" onchange="updateFileName(this, 'hero-360-file-name')">
+          <input type="hidden" id="hero-360-file-name" name="hero-360-file-name">
+          <input type="text" name="hero-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="hero-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('hero-360-notes')">Add Notes</button>
+          <input type="text" id="hero-360-notes" name="hero-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Stitch in PTGui for 8K resolution panorama.<br>
+            - Enhance details in Lightroom: Increase clarity (+20) and sharpness (+15).<br>
+            - Remove tripod shadow using nadir patching in PTGui.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-center, 20pt font.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Amenities (Handheld Single-Lens Image)</label>
+          <input type="file" onchange="updateFileName(this, 'amenity-single-file-name')">
+          <input type="hidden" id="amenity-single-file-name" name="amenity-single-file-name">
+          <input type="text" name="amenity-single-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="amenity-single-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('amenity-single-notes')">Add Notes</button>
+          <input type="text" id="amenity-single-notes" name="amenity-single-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Focus on composition in Photoshop: Crop to 1920x1080, rule of thirds.<br>
+            - Enhance colors in Lightroom: Boost saturation (+20) for vibrant pools/gyms.<br>
+            - Remove distractions (e.g., people) using content-aware fill.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-right, 18pt font.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Elevated 360 (Handheld 360 Image)</label>
+          <input type="file" onchange="updateFileName(this, 'elevated-promo-360-file-name')">
+          <input type="hidden" id="elevated-promo-360-file-name" name="elevated-promo-360-file-name">
+          <input type="text" name="elevated-promo-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="elevated-promo-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('elevated-promo-360-notes')">Add Notes</button>
+          <input type="text" id="elevated-promo-360-notes" name="elevated-promo-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Stitch in PTGui for high-resolution panorama.<br>
+            - Highlight scale in Lightroom: Adjust exposure (+0.5 stop) for clarity.<br>
+            - Remove selfie stick shadow using cloning tools in Photoshop.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-center, 20pt font.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Unique Details (Handheld Single-Lens Image)</label>
+          <input type="file" onchange="updateFileName(this, 'detail-single-file-name')">
+          <input type="hidden" id="detail-single-file-name" name="detail-single-file-name">
+          <input type="text" name="detail-single-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="detail-single-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('detail-single-notes')">Add Notes</button>
+          <input type="text" id="detail-single-notes" name="detail-single-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Highlight textures in Photoshop: Use high-pass filter for sharpness.<br>
+            - Crop to 1920x1080, focusing on architectural details.<br>
+            - Adjust contrast in Lightroom (+15) for depth.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-right, 18pt font.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Underwater 360 (Handheld 360 Image)</label>
+          <input type="file" onchange="updateFileName(this, 'water-360-file-name')">
+          <input type="hidden" id="water-360-file-name" name="water-360-file-name">
+          <input type="text" name="water-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="water-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('water-360-notes')">Add Notes</button>
+          <input type="text" id="water-360-notes" name="water-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Stitch in PTGui for seamless underwater panorama.<br>
+            - Correct water tint in Lightroom: Adjust white balance to remove blue/green hues.<br>
+            - Remove bubbles or debris using Photoshop’s spot healing tool.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-center, 20pt font.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+      </div>
+      <div class="checklist-section" id="promotional-videos">
+        <h2>Promotional Use (SYT.FYI) - Video Shots</h2>
+        <div class="shot-item">
+          <label>Cinematic Orbit (Drone Video)</label>
+          <input type="file" onchange="updateFileName(this, 'cinematic-drone-file-name')">
+          <input type="hidden" id="cinematic-drone-file-name" name="cinematic-drone-file-name">
+          <input type="text" name="cinematic-drone-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="cinematic-drone-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('cinematic-drone-notes')">Add Notes</button>
+          <input type="text" id="cinematic-drone-notes" name="cinematic-drone-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro: Trim to 30-60 seconds, use 4K, 24fps.<br>
+            - Add smooth transitions (cross-dissolve, 0.5s) between clips.<br>
+            - Color grade in DaVinci Resolve: Apply cinematic LUT for warm tones.<br>
+            - Insert title: "[Property Name] | Cinematic Orbit" at start, white, 24pt font.<br>
+            - Export as MP4, 4K, 24fps.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Virtual Tour (Handheld 360 Video)</label>
+          <input type="file" onchange="updateFileName(this, 'tour-360-file-name')">
+          <input type="hidden" id="tour-360-file-name" name="tour-360-file-name">
+          <input type="text" name="tour-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="tour-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('tour-360-notes')">Add Notes</button>
+          <input type="text" id="tour-360-notes" name="tour-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro: Trim to 1-2 minutes, use 8K resolution.<br>
+            - Add pause points at key spots with text overlays (e.g., "Lobby at 00:30") in white, 18pt font.<br>
+            - Adjust exposure in DaVinci Resolve for consistent lighting.<br>
+            - Insert title: "[Property Name] | Virtual Tour" at start, white, 24pt font.<br>
+            - Export as MP4, 8K, 24fps.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Guided Tour (Handheld Single-Lens Video)</label>
+          <input type="file" onchange="updateFileName(this, 'guide-video-file-name')">
+          <input type="hidden" id="guide-video-file-name" name="guide-video-file-name">
+          <input type="text" name="guide-video-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="guide-video-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('guide-video-notes')">Add Notes</button>
+          <input type="text" id="guide-video-notes" name="guide-video-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro: Keep guide in frame, trim to 1-2 minutes.<br>
+            - Add captions for key features (e.g., "Pool Area") in white, 18pt font.<br>
+            - Color grade in DaVinci Resolve for vibrant look.<br>
+            - Insert title: "[Property Name] | Guided Tour" at start, white, 24pt font.<br>
+            - Export as MP4, 4K, 24fps.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Bullet Time (Handheld 360 Video)</label>
+          <input type="file" onchange="updateFileName(this, 'bullet-360-file-name')">
+          <input type="hidden" id="bullet-360-file-name" name="bullet-360-file-name">
+          <input type="text" name="bullet-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="bullet-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('bullet-360-notes')">Add Notes</button>
+          <input type="text" id="bullet-360-notes" name="bullet-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro: Trim to 15-30 seconds for dynamic effect.<br>
+            - Smooth spin motion using keyframe adjustments.<br>
+            - Add title: "[Property Name] | Bullet Time" at start, white, 24pt font.<br>
+            - Enhance colors in DaVinci Resolve for dramatic effect.<br>
+            - Export as MP4, 8K, 24fps.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Time-Lapse (Handheld 360 Video)</label>
+          <input type="file" onchange="updateFileName(this, 'timelapse-promo-360-file-name')">
+          <input type="hidden" id="timelapse-promo-360-file-name" name="timelapse-promo-360-file-name">
+          <input type="text" name="timelapse-promo-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="timelapse-promo-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('timelapse-promo-360-notes')">Add Notes</button>
+          <input type="text" id="timelapse-promo-360-notes" name="timelapse-promo-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro: Speed up footage to create 15-30 second time-lapse.<br>
+            - Add title: "[Property Name] | Time-Lapse" at start, white, 24pt font.<br>
+            - Color grade in DaVinci Resolve for sunset vibrancy (+20 saturation).<br>
+            - Smooth transitions using fade effects.<br>
+            - Export as MP4, 8K, 24fps.
+          </div>
+        </div>
+      </div>
+      <div class="checklist-section" id="bonus-shots">
+        <h2>Bonus Shots</h2>
+        <div class="shot-item">
+          <label>360 Panorama (Handheld 360 Image)</label>
+          <input type="file" onchange="updateFileName(this, 'panorama-360-file-name')">
+          <input type="hidden" id="panorama-360-file-name" name="panorama-360-file-name">
+          <input type="text" name="panorama-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="panorama-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('panorama-360-notes')">Add Notes</button>
+          <input type="text" id="panorama-360-notes" name="panorama-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Stitch in PTGui for 8K high-res panorama.<br>
+            - Enhance clarity in Lightroom (+25) for VR compatibility.<br>
+            - Remove tripod shadow using nadir patching in PTGui.<br>
+            - Add watermark: "[Property Name] | SYT.FYI" in white, bottom-center, 20pt font.<br>
+            - Save as JPEG, quality 80%.
+          </div>
+        </div>
+        <div class="shot-item">
+          <label>Hyperlapse (Handheld 360 Video)</label>
+          <input type="file" onchange="updateFileName(this, 'hyperlapse-360-file-name')">
+          <input type="hidden" id="hyperlapse-360-file-name" name="hyperlapse-360-file-name">
+          <input type="text" name="hyperlapse-360-link" placeholder="Enter link...">
+          <label><input type="checkbox" name="hyperlapse-360-complete"> Completed</label>
+          <button type="button" class="notes-btn" onclick="toggleNotes('hyperlapse-360-notes')">Add Notes</button>
+          <input type="text" id="hyperlapse-360-notes" name="hyperlapse-360-notes" class="notes-input" placeholder="Add notes here...">
+          <div class="instructions">
+            - Edit in Premiere Pro: Speed up to create 15-30 second hyperlapse.<br>
+            - Smooth motion using keyframe adjustments.<br>
+            - Add title: "[Property Name] | Hyperlapse" at start, white, 24pt font.<br>
+            - Color grade in DaVinci Resolve for vibrant look.<br>
+            - Export as MP4, 8K, 24fps.
+          </div>
+        </div>
+      </div>
+      <div class="button-container">
+        <button type="button" class="download-btn" onclick="downloadPDF()">Download PDF</button>
+        <button type="submit" class="submit-btn">Submit to Drone360 CRM</button>
+      </div>
+    </form>
+  </div>
+  <div class="footer">
+    © 2025 SYT.FYI | All Rights Reserved | Contact: info@syt.fyi
+  </div>
+  <script>
+    document.getElementById('dark-mode-toggle').addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    function toggleNotes(inputId) {
+      const input = document.getElementById(inputId);
+      input.classList.toggle('visible');
+    }
+
+    function updateFileName(input, hiddenId) {
+      const fileName = input.files[0]?.name || '';
+      document.getElementById(hiddenId).value = fileName;
+    }
+
+    function updatePropertyID() {
+      const category = document.getElementById('property-category').value;
+      const suffix = document.getElementById('property-suffix').value.padStart(3, '0');
+      const propertyID = category && suffix ? `${category}${suffix}` : '';
+      document.getElementById('property-id-display').textContent = propertyID;
+    }
+
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      let yPos = 10;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(255, 87, 51);
+      doc.text('Post-Production Checklist', 105, yPos, { align: 'center' });
+      yPos += 10;
+
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      doc.setFontSize(10);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Generated: ${timestamp}`, 105, yPos, { align: 'center' });
+      yPos += 10;
+
+      const propertyName = document.getElementById('property-name').value || 'Unnamed Property';
+      const propertyAddress = document.getElementById('property-address').value || 'No address provided';
+      const propertyID = document.getElementById('property-id-display').textContent || 'No ID assigned';
+      doc.setFontSize(16);
+      doc.setTextColor('#333');
+      doc.text(`Property ID: ${propertyID}`, 10, yPos);
+      yPos += 5;
+      doc.text(`Property Name: ${propertyName}`, 10, yPos);
+      yPos += 5;
+      doc.text(`Property Address: ${propertyAddress}`, 10, yPos);
+      yPos += 10;
+
+      const sections = document.querySelectorAll('.checklist-section');
+      sections.forEach(section => {
+        doc.setFontSize(13);
+        doc.setTextColor(255, 87, 51);
+        doc.text(section.querySelector('h2').textContent, 10, yPos);
+        yPos += 10;
+
+        const items = section.querySelectorAll('.shot-item');
+        items.forEach(item => {
+          const label = item.querySelector('label').textContent;
+          const fileName = item.querySelector('input[type="hidden"]').value || 'No file';
+          const link = item.querySelector('input[type="text"][name$="-link"]').value || 'No link';
+          const complete = item.querySelector('input[type="checkbox"]').checked ? 'Yes' : 'No';
+          const notes = item.querySelector('.notes-input').value || 'No notes';
+
+          doc.setFontSize(10);
+          doc.setTextColor('#333');
+          const text = `${label}: File: ${fileName} | Link: ${link} | Complete: ${complete} | Notes: ${notes}`;
+          const textArr = doc.splitTextToSize(text, 180);
+          textArr.forEach(line => {
+            doc.text(line, 10, yPos);
+            yPos += 5;
+            if (yPos > 280) {
+              doc.addPage();
+              yPos = 10;
+            }
+          });
+        });
+        yPos += 5;
+      });
+
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Generated: ${timestamp}`, 10, 290);
+        doc.text('© 2025 SYT.FYI | All Rights Reserved | Contact: info@syt.fyi', 105, 290, { align: 'center' });
+      }
+
+      return doc;
+    }
+
+    function downloadPDF() {
+      const doc = generatePDF();
+      const propertyID = document.getElementById('property-id-display').textContent.replace(/[^a-zA-Z0-9]/g, '_') || 'No_ID';
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      doc.save(`Post_Production_Checklist_${propertyID}_${timestamp}.pdf`);
+    }
+
+    document.getElementById('post-production-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const propertyID = document.getElementById('property-id-display').textContent;
+      if (!propertyID) {
+        alert('Please select a property category and enter a valid ID number.');
+        return;
+      }
+      const formData = new FormData(e.target);
+      const data = {
+        propertyID: propertyID,
+        propertyName: document.getElementById('property-name').value,
+        propertyAddress: document.getElementById('property-address').value
+      };
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      window.parent.postMessage({ type: 'postProductionSubmission', data }, '*');
+      alert('Data submitted to Drone360 CRM!');
+    });
+  </script>
+</body>
+</html>
